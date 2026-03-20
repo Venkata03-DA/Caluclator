@@ -1,10 +1,15 @@
 name: CI Pipeline
 
 on:
-  push:                   #Events that trigger the pipeline
-    branches: [main]
+  push:
+    branches:
+      - staging
+    tags:
+      - 'v*'
   pull_request:
-    branches: [main]
+    branches:
+      - staging
+      - main
 
 jobs:                     # Defines the jobs that will run in the pipeline  
   test:
