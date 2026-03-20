@@ -25,23 +25,33 @@ jobs:                     # Defines the jobs that will run in the pipeline
       
   build-and-push:                     #job for building and pushing the Docker image
     runs-on: ubuntu-latest
-    needs: test              
+    needs: test
 
     steps:
-      - name: Checkout code           # Check out the code from the repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Log in to Docker Hub    #log in to Docker Hub using the credentials stored in GitHub Secrets
+      - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}  #Username and password that were created on dokerhub and stored in GitHub Secrets
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image         # Build the Docker image using the Dockerfile in the repository and push it to Docker Hub with the specified tag
+      # Rule 1: staging branch push → use commit ID as tag
+      - name: Push with commit ID (staging)
+        if: github.ref_type == 'branch'
         uses: docker/build-push-action@v5
         with:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/calculator:${{ github.sha }}
+
+      # Rule 3: tag created on master → use tag name
+      - name: Push with tag name (release)
+        if: github.ref_type == 'tag'
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/calculator:${{ github.ref_name }}
   
       
       

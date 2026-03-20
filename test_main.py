@@ -37,3 +37,14 @@ def test_add_negative():
     response = client.get("/add?a=-5&b=3")
     assert response.status_code == 200
     assert response.json() == {"result": -2}
+
+# Test 6: Divide two numbers
+def test_divide():
+    response = client.get("/divide?a=10&b=2")
+    assert response.status_code == 200
+    assert response.json() == {"result": 5.0}
+
+def test_divide_by_zero():
+    response = client.get("/divide?a=10&b=0")
+    assert response.status_code == 200
+    assert response.json() == {"error": "Cannot divide by zero"}
